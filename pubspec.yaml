@@ -1,0 +1,47 @@
+name: babond
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
+  introduction_screen: ^3.1.17
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/img/
+    - assets/logo/
+    - assets/launcher_icon/
+    - assets/landing/
+
+#splash screen
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/splash/Babond.png
+
+  android: true
+  ios: true
+  web: false
+
+  android_12:
+    image: assets/splash/Babond.png
+    icon_background_color: "#ffffff"
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/launcher_icon/Babond.png"
