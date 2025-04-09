@@ -1,12 +1,21 @@
-import 'package:babond/presentation/pages/main_navigation.dart';
-import 'package:babond/presentation/pages/onboarding_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:babond/presentation/pages/onboarding_page.dart';
+import 'package:babond/presentation/pages/main_navigation.dart';
+import 'package:babond/presentation/bloc/informasi/informasi_bloc.dart';
+
+import 'package:babond/domain/usecases/get_informasi_list.dart';
+import 'package:babond/domain/usecases/get_informasi_detail.dart'; 
+
+import 'package:babond/data/repositories/informasi_repository_impl.dart';
+import 'package:babond/data/datasources/remote/scraper_service.dart';
+
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding); // Pastikan splash tetap selama inisialisasi
   runApp(const MainApp());
 }
 
@@ -36,9 +45,8 @@ class _MainAppState extends State<MainApp> {
       _isLoading = false;
     });
 
-    // delay untuk splash
-    await Future.delayed(const Duration(seconds: 2));
-    FlutterNativeSplash.remove();
+    await Future.delayed(const Duration(seconds: 2));  // Durasi splash screen
+    FlutterNativeSplash.remove();  // Menghapus splash screen setelah selesai
   }
 
   void _completeOnboarding() async {
@@ -51,13 +59,28 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) return const SizedBox.shrink(); // kosong saat loading
+    if (_isLoading) return const SizedBox.shrink(); // Menunggu splash selesai
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: _isFirstTime
-          ? OnBoardingPage(onFinish: _completeOnboarding)
-          : const MainNavigation(),
+    final remoteDataSource = InformasiRemoteDataSourceImpl();
+    final repository = InformasiRepositoryImpl(remoteDataSource);
+    final getInformasiList = GetInformasiList(repository);
+    final getInformasiDetail = GetInformasiDetail(repository);
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => InformasiBloc(
+            getList: getInformasiList,
+            getDetail: getInformasiDetail,
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: _isFirstTime
+            ? OnBoardingPage(onFinish: _completeOnboarding)
+            : const MainNavigation(),
+      ),
     );
   }
 }
