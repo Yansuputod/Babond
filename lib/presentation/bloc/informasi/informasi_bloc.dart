@@ -13,7 +13,6 @@ class InformasiBloc extends Bloc<InformasiEvent, InformasiState> {
     required this.getDetail,
   }) : super(InformasiInitial()) {
     on<GetInformasiListEvent>((event, emit) async {
-      // Cek jika data sudah pernah dimuat sebelumnya
       if (state is InformasiLoaded) return;
 
       emit(InformasiLoading());
